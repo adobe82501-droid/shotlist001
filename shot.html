@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>撮影香盤表 Maker</title>
+  <style>
+    :root {
+      --bg: #f2f2f7;
+      --card-bg: #ffffff;
+      --border-subtle: #e5e5ea;
+      --text-main: #111111;
+      --text-sub: #8e8e93;
+      --accent: #007aff;
+      --radius-lg: 18px;
+      --radius-md: 10px;
+      --shadow-soft: 0 8px 24px rgba(0,0,0,0.08);
+      --row-highlight: #f2f2f7; /* 昼休憩用の薄いグレー */
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        system-ui, "Helvetica Neue", Arial, sans-serif;
+      margin: 0;
+      background: radial-gradient(circle at top, #ffffff 0, #f2f2f7 55%, #e5e5ea 100%);
+      color: var(--text-main);
+    }
+
+    .app-shell {
+      max-width: 1400px;
+      margin: 24px auto 32px;
+      padding: 0 12px;
+    }
+
+    .app-header { margin-bottom: 16px; }
+
+    .app-title {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      margin: 0 0 4px;
+    }
+
+    .app-subtitle {
+      font-size: 12px;
+      color: var(--text-sub);
+      margin: 0;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+      padding: 16px 18px 18px;
+      border: 1px solid rgba(255,255,255,0.8);
+      backdrop-filter: blur(20px);
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .toolbar-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .field-label {
+      font-size: 11px;
+      color: var(--text-sub);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .field-input {
+      padding: 6px 8px;
+      font-size: 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      min-width: 150px;
+      background: #f9f9fb;
+      outline: none;
+      transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .field-input:focus {
+      border-color: var(--accent);
+      background: #ffffff;
+      box-shadow: 0 0 0 2px rgba(0,122,255,0.15);
+    }
+
+    .toggle-label {
+      font-size: 11px;
+      color: var(--text-sub);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: none;
+      padding: 7px 14px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #f5f5f7;
+      color: var(--text-main);
+      transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.08s ease;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .btn:hover {
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      transform: translateY(-0.5px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .table-wrapper {
+      margin-top: 8px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      overflow: auto;
+      background: #ffffff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      min-width: 1000px;
+      table-layout: auto;
+    }
+
+    thead { background: #f5f5f7; }
+
+    th, td {
+      border-bottom: 1px solid #f0f0f0;
+      padding: 6px;
+      vertical-align: top;
+      position: relative;
+    }
+
+    th {
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-sub);
+      font-size: 10px;
+      user-select: none;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    .indexCell {
+      text-align: center;
+      color: var(--text-sub);
+      width: 32px;
+    }
+
+    .timeCell input[type="time"],
+    .num-input {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      font-size: 11px;
+      padding: 3px 6px;
+      background: #fafafa;
+      outline: none;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .timeCell input[type="time"]:focus,
+    .num-input:focus {
+      border-color: var(--accent);
+      background: #ffffff;
+    }
+
+    .num-input { text-align: right; }
+
+    .scene-input {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      font-size: 11px;
+      padding: 4px 7px;
+      background: #fafafa;
+      outline: none;
+    }
+
+    .scene-input:focus {
+      border-color: var(--accent);
+      background: #ffffff;
+    }
+
+    .memo {
+      width: 100%;
+      min-height: 40px;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      font-size: 11px;
+      padding: 4px 7px;
+      resize: vertical;
+      background: #fafafa;
+      outline: none;
+    }
+
+    .memo:focus {
+      border-color: var(--accent);
+      background: #ffffff;
+    }
+
+    .controls {
+      white-space: nowrap;
+      text-align: right;
+    }
+
+    .controls button {
+      margin-left: 2px;
+      padding: 2px 6px;
+      font-size: 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      background: #f5f5f7;
+      cursor: pointer;
+    }
+
+    .controls button:hover { background: #e5e5ea; }
+
+    .row-draggable { cursor: grab; }
+
+    .row-dragging { opacity: 0.4; }
+
+    .row-drop-target {
+      outline: 2px dashed rgba(0,122,255,0.6);
+      outline-offset: -3px;
+    }
+
+    .row-highlight {
+      background: var(--row-highlight);
+    }
+
+    .image-cell { min-width: 150px; }
+
+    .image-slot {
+      position: relative;
+    }
+
+    .image-input { display: none; }
+
+    .image-preview {
+      min-width: 80px;
+      max-width: 100%;
+      min-height: 60px;
+      max-height: 260px;
+      border-radius: 10px;
+      border: 1px dashed var(--border-subtle);
+      display: inline-block;
+      overflow: auto;
+      background: #fafafa;
+      color: var(--text-sub);
+      font-size: 10px;
+      text-align: center;
+      padding: 2px;
+      user-select: none;
+      resize: both; /* 幅・高さどちらも調整可能 */
+    }
+
+    .image-preview img {
+      max-width: 100%;
+      height: auto;
+      object-fit: contain;
+      display: block;
+    }
+
+    .image-dropping {
+      border-color: var(--accent);
+      background: #e5f2ff;
+    }
+
+    .image-clear {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      border: none;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.4);
+      color: #fff;
+      font-size: 9px;
+      width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .image-clear:hover { background: rgba(0,0,0,0.6); }
+
+    .col-resizer {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 4px;
+      height: 100%;
+      cursor: col-resize;
+      user-select: none;
+    }
+
+    .col-resizer:hover {
+      background: rgba(0,0,0,0.06);
+    }
+
+    @media (max-width: 900px) {
+      .toolbar { align-items: flex-start; }
+      .field-input { min-width: 120px; }
+    }
+
+    @media print {
+      body { background: #ffffff; }
+      .app-shell { max-width: none; margin: 0; padding: 0; }
+      .card {
+        box-shadow: none;
+        border-radius: 0;
+        border: none;
+        padding: 8px 8px 0;
+      }
+      .toolbar,
+      .no-print { display: none !important; }
+      .table-wrapper { border: none; }
+      table { font-size: 9px; min-width: 100%; }
+      th, td { border: none; padding: 3px 4px; }
+      input,
+      textarea {
+        border: none !important;
+        background: transparent !important;
+        padding: 0;
+      }
+      .image-preview {
+        border: none;
+        background: transparent;
+        resize: none;
+      }
+      .col-resizer,
+      .image-clear { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <h1 class="app-title">撮影香盤表</h1>
+      <p class="app-subtitle">自動保存・時間自動調整ON/OFF・画像/PSD共有対応</p>
+    </header>
+
+    <section class="card">
+      <div class="toolbar no-print">
+        <div class="toolbar-group">
+          <label class="field-label">
+            Project name
+            <input type="text" id="projectName" class="field-input">
+          </label>
+          <label class="field-label">
+            日付
+            <input type="date" id="shootDate" class="field-input">
+          </label>
+          <label class="field-label">
+            撮影場所
+            <input type="text" id="shootLocation" class="field-input">
+          </label>
+          <label class="field-label">
+            参加者
+            <input type="text" id="participants" class="field-input">
+          </label>
+        </div>
+        <div class="toolbar-group">
+          <label class="toggle-label">
+            <input type="checkbox" id="autoRecalc" checked>
+            時間自動調整
+          </label>
+          <button class="btn btn-primary" type="button" onclick="addRow()">＋ 行を追加</button>
+          <button class="btn" type="button" onclick="exportData()">エクスポート</button>
+          <button class="btn btn-ghost" type="button" onclick="triggerImport()">インポート</button>
+          <button class="btn btn-ghost" type="button" onclick="printPDF()">PDF出力</button>
+          <input type="file" id="importFile" class="no-print" accept="application/json" style="display:none;">
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table id="shotTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>開始</th>
+              <th>所要(分)</th>
+              <th>カット</th>
+              <th>シーン／イメージ</th>
+              <th>画像</th>
+              <th>メモ</th>
+              <th class="no-print">操作</th>
+            </tr>
+          </thead>
+          <tbody id="shotBody">
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'shotlist_v2'; // 前バージョンと同じキーでデータ引き継ぎ
+    let dragSrcRow = null;
+    let autoRecalc = true;
+
+    function timeToMinutes(t) {
+      if (!t) return 0;
+      const [h, m] = t.split(':').map(Number);
+      return h * 60 + m;
+    }
+
+    function minutesToTime(min) {
+      const day = 24 * 60;
+      min = (min % day + day) % day;
+      const h = Math.floor(min / 60);
+      const m = min % 60;
+      return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+    }
+
+    // -------- 画像まわり --------
+    function loadImageFile(file, preview) {
+      if (!file || !preview) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const dataUrl = e.target.result;
+        preview.dataset.imageData = dataUrl || '';
+        if (file.type && file.type.startsWith('image/')) {
+          preview.innerHTML = `<img src="${dataUrl}" alt="shot image">`;
+        } else {
+          // PSD などはファイル名だけ表示
+          preview.textContent = file.name;
+        }
+      };
+      // 画像でもPSDでも dataURL にする（共有・保存用）
+      reader.readAsDataURL(file);
+    }
+
+    function handleImageChange(input) {
+      const file = input.files && input.files[0];
+      const preview = input.closest('.image-slot').querySelector('.image-preview');
+      if (!file) {
+        preview.innerHTML = "";
+        preview.dataset.imageData = "";
+        saveState();
+        return;
+      }
+      loadImageFile(file, preview);
+      saveState();
+    }
+
+    function clearImage(input, preview) {
+      if (!input || !preview) return;
+      input.value = "";
+      preview.innerHTML = "";
+      preview.dataset.imageData = "";
+      saveState();
+    }
+
+    function attachImageSlot(slot) {
+      const input = slot.querySelector('.image-input');
+      const preview = slot.querySelector('.image-preview');
+      const clearBtn = slot.querySelector('.image-clear');
+
+      if (!input || !preview) return;
+
+      // D&D
+      preview.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        preview.classList.add('image-dropping');
+      });
+
+      preview.addEventListener('dragleave', () => {
+        preview.classList.remove('image-dropping');
+      });
+
+      preview.addEventListener('drop', (e) => {
+        e.preventDefault();
+        preview.classList.remove('image-dropping');
+        const file = e.dataTransfer.files && e.dataTransfer.files[0];
+        if (!file) return;
+        loadImageFile(file, preview);
+        saveState();
+      });
+
+      // クリックでファイル選択
+      preview.addEventListener('click', () => {
+        input.click();
+      });
+
+      // クリア
+      if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+          clearImage(input, preview);
+        });
+      }
+    }
+
+    // -------- 行生成 --------
+    function createRow(initialDuration = 30) {
+      const row = document.createElement('tr');
+      row.classList.add('row-draggable');
+      row.draggable = true;
+
+      row.innerHTML = `
+        <td class="indexCell"></td>
+        <td class="timeCell"><input type="time" class="startTime"></td>
+        <td><input type="number" class="num-input duration" value="${initialDuration}" min="1"></td>
+        <td><input type="number" class="num-input cuts" value="1" min="0"></td>
+        <td><input type="text" class="scene-input"></td>
+        <td class="image-cell">
+          <div class="image-slot">
+            <input type="file" class="image-input" accept="image/*,.psd">
+            <div class="image-preview"></div>
+            <button type="button" class="image-clear no-print">×</button>
+          </div>
+        </td>
+        <td><textarea class="memo"></textarea></td>
+        <td class="controls no-print">
+          <button type="button" onclick="duplicateRow(this)">複製</button>
+          <button type="button" onclick="deleteRow(this)">削除</button>
+        </td>
+      `;
+
+      attachRowEvents(row);
+
+      const slot = row.querySelector('.image-slot');
+      attachImageSlot(slot);
+
+      return row;
+    }
+
+    function addRow(initialDuration = 30) {
+      const tbody = document.getElementById('shotBody');
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      const row = createRow(initialDuration);
+      tbody.appendChild(row);
+      updateIndices();
+
+      const startInput = row.querySelector('.startTime');
+
+      if (rows.length === 0) {
+        startInput.value = "09:00";
+      } else if (autoRecalc) {
+        const prevRow = rows[rows.length - 1];
+        const prevStart = timeToMinutes(prevRow.querySelector('.startTime').value || "09:00");
+        const prevDuration = parseInt(prevRow.querySelector('.duration').value || "0", 10) || 0;
+        const newStart = prevStart + prevDuration;
+        startInput.value = minutesToTime(newStart);
+      }
+
+      saveState();
+      return row;
+    }
+
+    function duplicateRow(button) {
+      const srcRow = button.closest('tr');
+      const tbody = document.getElementById('shotBody');
+      const duration = parseInt(srcRow.querySelector('.duration').value || "30", 10) || 30;
+      const newRow = createRow(duration);
+
+      // 値コピー（画像以外）
+      newRow.querySelector('.startTime').value = srcRow.querySelector('.startTime').value || "";
+      newRow.querySelector('.duration').value = srcRow.querySelector('.duration').value || "";
+      newRow.querySelector('.cuts').value = srcRow.querySelector('.cuts').value || "";
+      newRow.querySelector('.scene-input').value = srcRow.querySelector('.scene-input').value || "";
+      newRow.querySelector('.memo').value = srcRow.querySelector('.memo').value || "";
+
+      if (srcRow.classList.contains('row-highlight')) {
+        newRow.classList.add('row-highlight');
+      }
+
+      tbody.insertBefore(newRow, srcRow.nextSibling);
+      updateIndices();
+      if (autoRecalc) recalcAllTimes();
+      saveState();
+    }
+
+    function updateIndices() {
+      const rows = document.querySelectorAll('#shotBody tr');
+      rows.forEach((row, idx) => {
+        const cell = row.querySelector('.indexCell');
+        if (cell) cell.textContent = idx + 1;
+      });
+    }
+
+    // -------- 時間計算 --------
+    function recalcAllTimes() {
+      if (!autoRecalc) return;
+      const rows = Array.from(document.querySelectorAll('#shotBody tr'));
+      if (rows.length === 0) return;
+
+      let currentMinutes = timeToMinutes(rows[0].querySelector('.startTime').value || "09:00");
+      rows[0].querySelector('.startTime').value = minutesToTime(currentMinutes);
+
+      for (let i = 1; i < rows.length; i++) {
+        const prevDuration = parseInt(rows[i-1].querySelector('.duration').value || "0", 10) || 0;
+        currentMinutes += prevDuration;
+        const startInput = rows[i].querySelector('.startTime');
+        startInput.value = minutesToTime(currentMinutes);
+      }
+    }
+
+    function recalcFromRow(row) {
+      if (!autoRecalc) return;
+      const tbody = document.getElementById('shotBody');
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      const idx = rows.indexOf(row);
+      if (idx === -1) return;
+
+      let currentMinutes = timeToMinutes(row.querySelector('.startTime').value || "09:00");
+      row.querySelector('.startTime').value = minutesToTime(currentMinutes);
+
+      for (let i = idx + 1; i < rows.length; i++) {
+        const prevRow = rows[i - 1];
+        const prevStart = timeToMinutes(prevRow.querySelector('.startTime').value || "09:00");
+        const prevDuration = parseInt(prevRow.querySelector('.duration').value || "0", 10) || 0;
+        const thisStart = prevStart + prevDuration;
+        const startInput = rows[i].querySelector('.startTime');
+        startInput.value = minutesToTime(thisStart);
+      }
+    }
+
+    function deleteRow(button) {
+      const row = button.closest('tr');
+      row.remove();
+      updateIndices();
+      recalcAllTimes();
+      saveState();
+    }
+
+    function printPDF() {
+      window.print();
+    }
+
+    // -------- 行イベント（ドラッグ & 昼休憩ハイライト） --------
+    function attachRowEvents(row) {
+      // ドラッグ並び替え
+      row.addEventListener('dragstart', (e) => {
+        dragSrcRow = row;
+        row.classList.add('row-dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+
+      row.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        const target = row;
+        if (target && target !== dragSrcRow) {
+          target.classList.add('row-drop-target');
+        }
+      });
+
+      row.addEventListener('dragleave', () => {
+        row.classList.remove('row-drop-target');
+      });
+
+      row.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const tbody = document.getElementById('shotBody');
+        const target = row;
+        if (dragSrcRow && target && dragSrcRow !== target) {
+          const rows = Array.from(tbody.querySelectorAll('tr'));
+          const srcIndex = rows.indexOf(dragSrcRow);
+          const targetIndex = rows.indexOf(target);
+
+          if (srcIndex < targetIndex) {
+            tbody.insertBefore(dragSrcRow, target.nextSibling);
+          } else {
+            tbody.insertBefore(dragSrcRow, target);
+          }
+        }
+        cleanupDragState();
+        updateIndices();
+        recalcAllTimes();
+        saveState();
+      });
+
+      row.addEventListener('dragend', () => {
+        cleanupDragState();
+      });
+
+      // ダブルクリックで昼休憩などのハイライト切り替え
+      row.addEventListener('dblclick', () => {
+        row.classList.toggle('row-highlight');
+        saveState();
+      });
+    }
+
+    function cleanupDragState() {
+      const rows = document.querySelectorAll('#shotBody tr');
+      rows.forEach(r => {
+        r.classList.remove('row-dragging', 'row-drop-target');
+      });
+      dragSrcRow = null;
+    }
+
+    // -------- 列リサイズ --------
+    function setColumnWidth(colIndex, width) {
+      const table = document.getElementById('shotTable');
+      const headerCells = table.querySelectorAll('thead th');
+      const bodyRows = table.querySelectorAll('tbody tr');
+      if (headerCells[colIndex]) {
+        headerCells[colIndex].style.width = width + 'px';
+      }
+      bodyRows.forEach(row => {
+        const cell = row.children[colIndex];
+        if (cell) {
+          cell.style.width = width + 'px';
+        }
+      });
+    }
+
+    function setupColumnResize() {
+      const table = document.getElementById('shotTable');
+      const headerCells = table.querySelectorAll('thead th');
+
+      headerCells.forEach((th, index) => {
+        const resizer = document.createElement('div');
+        resizer.className = 'col-resizer';
+        th.appendChild(resizer);
+
+        let startX = 0;
+        let startWidth = 0;
+
+        function onMouseMove(e) {
+          const delta = e.pageX - startX;
+          const newWidth = Math.max(40, startWidth + delta);
+          setColumnWidth(index, newWidth);
+        }
+
+        function onMouseUp() {
+          document.removeEventListener('mousemove', onMouseMove);
+          document.removeEventListener('mouseup', onMouseUp);
+          saveState(); // 列幅も保存
+        }
+
+        resizer.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          startX = e.pageX;
+          startWidth = th.offsetWidth;
+          document.addEventListener('mousemove', onMouseMove);
+          document.addEventListener('mouseup', onMouseUp);
+        });
+      });
+    }
+
+    // -------- 状態保存・復元 --------
+    function getState(includeImages = true) {
+      const rows = Array.from(document.querySelectorAll('#shotBody tr'));
+      const table = document.getElementById('shotTable');
+      const headerCells = table.querySelectorAll('thead th');
+
+      return {
+        header: {
+          projectName: document.getElementById('projectName').value || "",
+          shootDate: document.getElementById('shootDate').value || "",
+          shootLocation: document.getElementById('shootLocation').value || "",
+          participants: document.getElementById('participants').value || "",
+          autoRecalc: document.getElementById('autoRecalc')?.checked ?? true
+        },
+        columns: Array.from(headerCells).map(th => th.style.width || ""),
+        rows: rows.map(row => {
+          const preview = row.querySelector('.image-preview');
+          const imageLabel = (preview?.textContent || "").trim();
+          const imageData = includeImages ? (preview?.dataset.imageData || "") : "";
+          return {
+            startTime: row.querySelector('.startTime').value || "",
+            duration: row.querySelector('.duration').value || "",
+            cuts: row.querySelector('.cuts').value || "",
+            scene: row.querySelector('.scene-input').value || "",
+            memo: row.querySelector('.memo').value || "",
+            highlight: row.classList.contains('row-highlight'),
+            imageLabel,
+            imageData
+          };
+        })
+      };
+    }
+
+    function applyState(state) {
+      if (!state) return;
+      const tbody = document.getElementById('shotBody');
+      tbody.innerHTML = "";
+
+      const header = state.header || {};
+      document.getElementById('projectName').value = header.projectName || "";
+      document.getElementById('shootDate').value = header.shootDate || "";
+      document.getElementById('shootLocation').value = header.shootLocation || "";
+      document.getElementById('participants').value = header.participants || "";
+
+      const autoCheck = document.getElementById('autoRecalc');
+      autoRecalc = header.autoRecalc !== false; // デフォルト true
+      if (autoCheck) autoCheck.checked = autoRecalc;
+
+      const rowsData = state.rows || [];
+      rowsData.forEach(r => {
+        const dur = parseInt(r.duration || "30", 10) || 30;
+        const row = createRow(dur);
+        tbody.appendChild(row);
+
+        row.querySelector('.startTime').value = r.startTime || "";
+        row.querySelector('.duration').value = r.duration || "";
+        row.querySelector('.cuts').value = r.cuts || "";
+        row.querySelector('.scene-input').value = r.scene || "";
+        row.querySelector('.memo').value = r.memo || "";
+        if (r.highlight) row.classList.add('row-highlight');
+
+        const preview = row.querySelector('.image-preview');
+        if (preview) {
+          const data = r.imageData || "";
+          const label = r.imageLabel || "";
+          preview.dataset.imageData = data;
+          if (data) {
+            if (data.startsWith('data:image/')) {
+              preview.innerHTML = `<img src="${data}" alt="shot image">`;
+            } else {
+              const safeLabel = label || 'file.psd';
+              preview.innerHTML = `<a href="${data}" download="${safeLabel}">${safeLabel}</a>`;
+            }
+          } else if (label) {
+            preview.textContent = label;
+          }
+        }
+      });
+
+      updateIndices();
+
+      // 列幅復元
+      const table = document.getElementById('shotTable');
+      const headerCells = table.querySelectorAll('thead th');
+      if (state.columns && state.columns.length) {
+        state.columns.forEach((w, i) => {
+          if (w) {
+            headerCells[i].style.width = w;
+            const bodyRows = table.querySelectorAll('tbody tr');
+            bodyRows.forEach(row => {
+              const cell = row.children[i];
+              if (cell) cell.style.width = w;
+            });
+          }
+        });
+      }
+    }
+
+    function saveState() {
+      const state = getState(true); // 自動保存にも画像含める
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        console.warn('保存に失敗しました（容量オーバーなど）', e);
+      }
+    }
+
+    function loadStateFromStorage() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        return JSON.parse(raw);
+      } catch (e) {
+        console.warn('保存データの読み込みに失敗しました', e);
+        return null;
+      }
+    }
+
+    // -------- エクスポート / インポート --------
+    function exportData() {
+      const state = getState(true); // 画像データも含めて書き出し
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'shotlist_project.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function triggerImport() {
+      const input = document.getElementById('importFile');
+      input.value = "";
+      input.click();
+    }
+
+    function handleImportFile(evt) {
+      const file = evt.target.files && evt.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const state = JSON.parse(e.target.result);
+          applyState(state);
+          saveState();
+        } catch (err) {
+          alert('JSON の読み込みに失敗しました');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // -------- 初期化 --------
+    window.addEventListener('DOMContentLoaded', () => {
+      const saved = loadStateFromStorage();
+      if (saved && saved.rows && saved.rows.length > 0) {
+        applyState(saved);
+      } else {
+        addRow(30);
+        addRow(30);
+        addRow(30);
+        recalcAllTimes();
+      }
+      setupColumnResize();
+
+      document.getElementById('importFile').addEventListener('change', handleImportFile);
+
+      // ヘッダー入力も自動保存
+      ['projectName','shootDate','shootLocation','participants'].forEach(id => {
+        const el = document.getElementById(id);
+        el.addEventListener('input', saveState);
+        el.addEventListener('change', saveState);
+      });
+
+      const autoCheck = document.getElementById('autoRecalc');
+      autoCheck.addEventListener('change', () => {
+        autoRecalc = autoCheck.checked;
+        saveState();
+        if (autoRecalc) recalcAllTimes();
+      });
+    });
+
+    // 行内イベントでの変更を拾って保存
+    document.getElementById('shotBody').addEventListener('change', (e) => {
+      if (e.target.classList.contains('image-input')) {
+        handleImageChange(e.target);
+        return;
+      }
+      if (e.target.classList.contains('startTime')) {
+        const row = e.target.closest('tr');
+        recalcFromRow(row);
+        saveState();
+        return;
+      }
+      if (e.target.classList.contains('duration') || e.target.classList.contains('cuts')) {
+        const row = e.target.closest('tr');
+        recalcFromRow(row);
+        saveState();
+        return;
+      }
+      if (e.target.classList.contains('scene-input') ||
+          e.target.classList.contains('memo')) {
+        saveState();
+      }
+    });
+
+    document.getElementById('shotBody').addEventListener('input', (e) => {
+      if (e.target.classList.contains('duration')) {
+        const row = e.target.closest('tr');
+        recalcFromRow(row);
+        saveState();
+      } else if (e.target.classList.contains('scene-input') ||
+                 e.target.classList.contains('memo') ||
+                 e.target.classList.contains('cuts')) {
+        saveState();
+      }
+    });
+  </script>
+</body>
+</html>
